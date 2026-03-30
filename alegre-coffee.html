@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alegre Coffee Sidoarjo — Menu Digital</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{espresso:'#1A0A00',roast:'#2C1503',bark:'#4A2810',mocha:'#7B4A2D',caramel:'#B07840',honey:'#C99A5A',latte:'#D4B896',cream:'#F5EAD8',foam:'#FBF5EC',parchment:'#FEFAF4'},fontFamily:{display:['Playfair Display','serif'],body:['DM Sans','sans-serif']}}}}
+</script>
+<style>
+/* GANTI INI */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  /* Hapus max-width dan overflow-x dari sini */
+}
+
+/* GUNAKAN INI UNTUK MENCEGAH SCROLL SAMPING */
+/* 1. Pastikan HTML dan Body benar-benar mengunci scroll horizontal */
+html, body {
+  width: 100%;
+  max-width: 100vw; /* Tambahkan ini */
+  overflow-x: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Tambahkan overflow-x: hidden pada mobile-header */
+.mobile-header {
+  background: rgba(26, 10, 0, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  overflow: hidden; /* SANGAT PENTING: Untuk memotong hero-ring yang keluar layar */
+}
+
+/* 3. Perbaiki main-area agar tidak 'bocor' */
+.main-area {
+  flex: 1;
+  min-width: 0;
+  width: 100%; /* Pastikan lebarnya fix 100% */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden; /* Tambahkan ini */
+}
+
+/* 4. Pastikan baris Menu Favorit (scroll-x) tidak merusak layout utama */
+.scroll-x {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100vw;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.25;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:#F5EAD8;}
+::-webkit-scrollbar-thumb{background:#C99A5A;border-radius:4px;}
+.scroll-x{scrollbar-width:none;-ms-overflow-style:none;}
+.scroll-x::-webkit-scrollbar{display:none;}
+
+/* Layout */
+/* Layout Update */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 255px;
+  flex-shrink: 0;
+  position: fixed; /* Berubah jadi fixed agar tidak ikut scroll */
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #1A0A00 0%, #2C1503 55%, #4A2810 100%);
+  display: none;
+  flex-direction: column;
+  z-index: 50;
+}
+
+@media(min-width:1024px) {
+  /* Memberi ruang di kiri agar konten tidak tertutup sidebar yang fixed */
+  .main-area {
+    margin-left: 255px; 
+  }
+  /* Menghilangkan header cokelat kategori di desktop */
+  .mobile-header {
+    display: none !important;
+  }
+  .desktop-topbar {
+    display: flex !important;
+  }
+}
+@media(min-width:1024px){
+  .sidebar{display:flex;}
+  .mobile-header{overflow: hidden;}
+  .desktop-topbar{display:flex!important;}
+  .float-mobile{display:none!important;}
+}
+.main-area{flex:1;min-width:0;display:flex;flex-direction:column;}
+.desktop-topbar{display:none;background:#fff;border-bottom:1px solid rgba(212,184,150,.28);padding:14px 32px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 2px 10px rgba(26,10,0,.05);}
+.content-area{max-width:1120px;width:100%;margin:0 auto;padding:0 14px 120px;}
+@media(min-width:768px){
+  .content-area{
+    padding:20px 20px 80px;
+  }
+}
+@media(min-width:1024px){.content-area{padding:28px 36px 60px;}}
+
+/* Mobile header */
+.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,154,90,.12);animation:spin 22s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Sidebar pill */
+.sidebar-pill{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;cursor:pointer;transition:all .2s;color:rgba(212,184,150,.65);font-size:13px;font-weight:500;}
+.sidebar-pill:hover{background:rgba(255,255,255,.07);color:#F5EAD8;}
+.sidebar-pill.active{background:rgba(201,154,90,.16);color:#C99A5A;font-weight:600;}
+
+/* Mobile cat pill */
+.cat-pill{transition:all .22s cubic-bezier(.4,0,.2,1);white-space:nowrap;cursor:pointer;flex-shrink:0;}
+.cat-pill.active{background:#4A2810!important;color:#F5EAD8!important;border-color:transparent!important;box-shadow:0 4px 12px rgba(74,40,16,.35)!important;}
+
+/* Menu card */
+/* 1. Efek Kartu yang Lebih "Deep" */
+.menu-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 184, 150, 0.1);
+  border-radius: 24px; /* Lebih bulat lebih modern */
+}
+
+
+/* 3. Animasi Hover yang Lebih Smooth */
+.menu-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(26, 10, 0, 0.15);
+}
+.menu-card:active{transform:scale(.98);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.menu-card:nth-child(1){animation-delay:.03s;}.menu-card:nth-child(2){animation-delay:.06s;}.menu-card:nth-child(3){animation-delay:.09s;}.menu-card:nth-child(4){animation-delay:.12s;}.menu-card:nth-child(5){animation-delay:.15s;}.menu-card:nth-child(6){animation-delay:.18s;}
+
+/* BS card */
+.bs-card{flex-shrink:0;width:160px;border-radius:20px;overflow:hidden;transition:transform .28s ease,box-shadow .28s;cursor:pointer;box-shadow:0 5px 18px rgba(26,10,0,.22);}
+@media (min-width:768px){
+  .bs-card{
+    width:200px;
+  }
+}
+.bs-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 14px 30px rgba(26,10,0,.3);}
+
+/* Qty btn */
+.qty-btn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;user-select:none;transition:all .16s ease;}
+.qty-btn:active{transform:scale(.82);}
+
+/* Float WA */
+.float-wa{background:linear-gradient(135deg,#25D366,#128C7E);box-shadow:0 8px 22px rgba(37,211,102,.38);transition:all .28s cubic-bezier(.4,0,.2,1);animation:floatIn .6s cubic-bezier(.34,1.56,.64,1) .8s both;}
+.float-wa:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(37,211,102,.48);}
+.float-wa:active{transform:scale(.96);}
+@keyframes floatIn{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:none;}}
+.badge-pulse{animation:bp 2s infinite;}
+@keyframes bp{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+
+/* Modal */
+.modal-ov{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:mfade .2s ease;}
+.modal-box{animation:mup .32s cubic-bezier(.34,1.56,.64,1);}
+.cart-sheet{animation:csl .3s cubic-bezier(.4,0,.2,1);}
+@keyframes mfade{from{opacity:0;}to{opacity:1;}}
+@keyframes mup{from{opacity:0;transform:translateY(50px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes csl{from{transform:translateY(100%);}to{transform:none;}}
+
+/* Toast */
+.toast-in{animation:tin .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes tin{from{opacity:0;transform:translateX(110%);}to{opacity:1;transform:none;}}
+
+/* Input */
+.fancy-input{border:2px solid rgba(176,120,64,.2);border-radius:14px;background:#FBF5EC;font-family:'DM Sans',sans-serif;transition:border-color .2s,box-shadow .2s;}
+.fancy-input:focus{outline:none;border-color:#B07840;box-shadow:0 0 0 4px rgba(176,120,64,.1);}
+
+/* Utils */
+.sec-title::before{content:'';display:inline-block;width:3px;height:.9em;background:linear-gradient(to bottom,#C99A5A,#7B4A2D);margin-right:10px;border-radius:2px;vertical-align:middle;}
+.dashed{border:none;border-top:1px dashed rgba(176,120,64,.2);}
+.add-btn{transition:all .2s cubic-bezier(.4,0,.2,1);}
+.add-btn.added{background:#4A2810;color:#F5EAD8;}
+.in-cart-badge{background:rgba(74,40,16,.11);color:#4A2810;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;}
+.about-bg{background:linear-gradient(155deg,#1A0A00 0%,#2C1503 55%,#4A2810 100%);}
+.illus-wrap{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+</style>
+</head>
+<body>
+
+<!-- NAME MODAL -->
+<div id="nameModal" class="modal-ov fixed inset-0 bg-espresso/60 z-[60] flex items-end sm:items-center justify-center hidden">
+  <div class="modal-box bg-parchment w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-6 pb-8">
+    <div class="w-10 h-1 bg-latte rounded-full mx-auto mb-5 sm:hidden"></div>
+    <div class="flex justify-center mb-4">
+      <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-xl flex items-center justify-center" style="background:linear-gradient(145deg,#2C1503,#1A0A00);">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <rect x="7" y="17" width="22" height="16" rx="5" fill="#C99A5A" opacity=".85"/>
+          <path d="M29 20h4a4 4 0 010 8h-4" stroke="#C99A5A" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <rect x="10" y="33" width="16" height="3" rx="1.5" fill="#B07840" opacity=".6"/>
+          <ellipse cx="18" cy="17" rx="8" ry="3" fill="#C99A5A" opacity=".3"/>
+          <path d="M13 13c0-2 2-2 2-4M18 13c0-2 2-2 2-4M23 13c0-2 2-2 2-4" stroke="#F5EAD8" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+    <h2 class="font-display font-bold text-espresso text-xl text-center">Halo, siapa namamu?</h2>
+    <p class="text-mocha text-sm text-center mt-1 mb-5">Biar pesananmu lebih personal ✨</p>
+    <label class="block text-xs font-semibold text-mocha mb-1.5 tracking-widest uppercase">Nama Kamu</label>
+    <input id="customerNameInput" type="text" placeholder="Ketik nama kamu..." maxlength="40" autocomplete="off"
+      class="fancy-input w-full px-4 py-3.5 text-espresso text-base"
+      onkeydown="if(event.key==='Enter')saveName()">
+    <p id="nameError" class="text-red-500 text-xs mt-1.5 hidden">⚠ Nama wajib diisi ya!</p>
+    <button onclick="saveName()" class="mt-4 w-full bg-bark hover:bg-espresso active:scale-95 text-cream font-semibold py-4 rounded-2xl transition-all text-sm tracking-wide shadow-lg">
+      Mulai Pesan →
+    </button>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div id="cartModal" class="modal-ov fixed inset-0 bg-espresso/60 z-[60] flex items-end justify-center hidden">
+  <div class="cart-sheet bg-parchment w-full max-w-lg rounded-t-3xl flex flex-col" style="max-height:88vh;">
+    <div class="px-5 pt-5 pb-3 flex items-center justify-between border-b border-latte/25 flex-shrink-0 relative">
+      <div class="w-10 h-1 bg-latte rounded-full absolute left-1/2 -translate-x-1/2 top-2.5"></div>
+      <h3 class="font-display font-bold text-espresso text-lg mt-1">Keranjang Pesanan</h3>
+      <button onclick="closeCart()" class="w-8 h-8 rounded-full bg-cream flex items-center justify-center text-mocha hover:bg-latte transition-colors">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="px-5 py-3 bg-bark/5 border-b border-latte/20 flex-shrink-0 flex items-center gap-4 text-sm">
+      <span class="text-mocha flex items-center gap-1.5">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Meja <strong class="text-espresso ml-0.5" id="cartMeja">-</strong>
+      </span>
+      <span class="w-px h-4 bg-latte/35"></span>
+      <span class="text-mocha flex items-center gap-1.5">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="cartNama" class="text-espresso font-semibold">-</span>
+      </span>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto px-5 py-4 space-y-3"></div>
+    <div id="cartEmpty" class="flex-1 flex flex-col items-center justify-center py-12 hidden">
+      <svg width="54" height="54" viewBox="0 0 54 54" fill="none" class="mb-4 opacity-25">
+        <path d="M7 7h4l5.6 22.4A4 4 0 0020.5 32h20a4 4 0 003.88-3.03L47 16H15" stroke="#7B4A2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="22" cy="40" r="3" fill="#7B4A2D"/>
+        <circle cx="38" cy="40" r="3" fill="#7B4A2D"/>
+      </svg>
+      <p class="text-mocha font-medium">Keranjang masih kosong</p>
+      <p class="text-mocha/45 text-sm mt-1">Pilih menu dulu yuk!</p>
+    </div>
+    <div id="cartFooter" class="px-5 py-4 border-t border-latte/22 flex-shrink-0 bg-parchment hidden">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-mocha text-sm">Total Pesanan</span>
+        <span class="font-display font-bold text-espresso text-xl" id="cartTotal">Rp 0</span>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="clearCart()" class="px-4 py-3.5 rounded-2xl bg-cream text-mocha text-sm font-semibold hover:bg-latte transition-colors active:scale-95">Hapus</button>
+        <button onclick="orderViaWhatsApp()" class="flex-1 py-3.5 rounded-2xl font-semibold text-sm active:scale-95 flex items-center justify-center gap-2 text-white" style="background:linear-gradient(135deg,#25D366,#128C7E);box-shadow:0 4px 14px rgba(37,211,102,.3);">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Order via WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast-in fixed top-4 right-4 z-[70] bg-bark text-cream px-4 py-3 rounded-2xl shadow-2xl text-sm font-medium items-center gap-2 hidden max-w-[260px] flex">
+  <span id="toastIcon" class="flex-shrink-0 text-honey"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- APP SHELL -->
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="px-5 pt-7 pb-5 flex-shrink-0">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,154,90,.13);">
+          <img src="img/logo.jpg" alt="Alegre Coffee Logo" class="w-6 h-6 object-cover rounded-md">
+        </div>
+        <div>
+          <h1 class="font-display font-bold text-foam text-base tracking-tight leading-tight">Alegre Coffee Sidoarjo</h1>
+          <p class="text-latte/45 text-[10px]">Menu Digital</p>
+        </div>
+      </div>
+      <div class="mt-4 bg-white/6 rounded-2xl p-3.5 border border-white/8">
+        <p class="text-latte/45 text-[10px] uppercase tracking-widest mb-1">Meja Anda</p>
+        <p class="text-honey font-display font-bold text-2xl" id="sidebarMeja">-</p>
+        <p class="text-latte/40 text-[10px] mt-0.5" id="sidebarNama">Belum login</p>
+      </div>
+    </div>
+    <nav class="px-4 flex-1 overflow-y-auto pb-4">
+      <p class="text-latte/30 text-[10px] uppercase tracking-widest px-2 mb-2">Kategori Menu</p>
+      <div id="sidebarNav" class="space-y-0.5"></div>
+    </nav>
+    <div class="px-5 py-5 flex-shrink-0 border-t border-white/8">
+      <p class="text-latte/35 text-[10px] uppercase tracking-widest mb-2">Jam Buka</p>
+      <p class="text-latte/75 text-xs">Sen–Jum <span class="text-foam font-medium ml-1">08:00–22:00</span></p>
+      <p class="text-latte/75 text-xs mt-0.5">Sab–Min <span class="text-foam font-medium ml-1">09:00–23:00</span></p>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <!-- Desktop topbar -->
+    <div class="desktop-topbar">
+      <div>
+        <p class="text-xs text-mocha/55">Selamat datang</p>
+        <h2 class="font-display font-bold text-espresso text-base leading-tight">Menu Alegre Coffee</h2>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center bg-foam rounded-xl px-3 gap-2 border border-latte/28" style="width:235px;">
+          <svg width="13" height="13" fill="none" stroke="#B07840" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Cari menu..." class="bg-transparent text-sm text-espresso placeholder-mocha/38 py-2.5 flex-1 focus:outline-none" oninput="handleSearch(this.value)" id="desktopSearch">
+        </div>
+        <button onclick="openCart()" class="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-bark text-cream text-sm font-semibold hover:bg-espresso transition-colors">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Keranjang
+          <span id="desktopCartBadge" class="hidden badge-pulse bg-honey text-espresso font-bold text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile header -->
+    <header class="mobile-header sticky top-0 z-40 shadow-xl">
+      <div class="hero-ring" style="width:280px;height:280px;top:-140px;right:-70px;"></div>
+      <div class="hero-ring" style="width:180px;height:180px;top:-55px;right:45px;animation-duration:28s;animation-direction:reverse;opacity:.55;"></div>
+      <div class="relative z-10 px-4 pt-4 pb-2 flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(201,154,90,.15);">
+              <img src="img/logo.jpg" alt="Alegre Coffee Logo" class="w-6 h-6 object-cover rounded-md">
+            </div>
+            <h1 class="font-display font-bold text-foam text-lg tracking-tight">Alegre Coffee Sidoarjo</h1>
+          </div>
+          <div class="flex items-center gap-1.5 mt-0.5 pl-9">
+            <svg width="9" height="9" fill="none" stroke="#C99A5A" stroke-width="2" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="mobileTableText" class="text-xs text-honey font-semibold">Meja -</span>
+            <span class="text-latte/30 text-xs">•</span>
+            <span class="text-xs text-latte/55">08:00–22:00</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleSearch()" class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-foam hover:bg-white/16 transition-colors">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+          <button onclick="openCart()" class="relative w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-foam hover:bg-white/16 transition-colors">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            <span id="mobileCartBadge" class="hidden badge-pulse absolute -top-1 -right-1 w-5 h-5 rounded-full bg-honey text-espresso text-[10px] font-bold flex items-center justify-center">0</span>
+          </button>
+        </div>
+      </div>
+      <div id="mobileSearchBar" class="relative z-10 px-4 pb-2 hidden">
+        <div class="flex items-center bg-white/11 rounded-xl px-3 gap-2">
+          <svg width="12" height="12" fill="none" stroke="rgba(245,234,216,.55)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="mobileSearch" type="text" placeholder="Cari menu..." autocomplete="off"
+            class="flex-1 bg-transparent text-foam placeholder-latte/38 text-sm py-2.5 focus:outline-none"
+            oninput="handleSearch(this.value)">
+          <button onclick="clearSearch()" class="text-latte/45 text-xs px-1">✕</button>
+        </div>
+      </div>
+      <div class="relative z-10 pb-3">
+        <div id="mobileCatTabs" class="scroll-x flex gap-2 px-4 overflow-x-auto"></div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+
+      <!-- Welcome banner -->
+      <div class="py-5 px-5 rounded-2xl mb-6 flex items-center justify-between border border-latte/20 mt-4 lg:mt-0" style="background:linear-gradient(135deg,rgba(74,40,16,.06),rgba(176,120,64,.05));">
+        <div>
+          <p class="text-xs text-mocha/55 font-medium tracking-wide uppercase">Selamat datang, <span id="bannerNama"></span> 👋</p>
+          <h2 class="font-display text-espresso text-2xl font-bold leading-tight mt-0.5">
+            Meja <span class="text-caramel" id="tableNumDisplay">-</span>
+          </h2>
+          <p class="text-xs text-mocha/50 mt-1">Pilih menu & pesan via WhatsApp 🚀</p>
+        </div>
+        <div class="w-15 h-15 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-lg" style="width:58px;height:58px;background:linear-gradient(145deg,#2C1503,#1A0A00);">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="13" width="18" height="13" rx="4" fill="#C99A5A" opacity=".85"/>
+            <path d="M22 16h3a3 3 0 010 6h-3" stroke="#C99A5A" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <rect x="7" y="26" width="12" height="2.5" rx="1.25" fill="#B07840" opacity=".55"/>
+            <path d="M10 10c0-2 2-2 2-4M16 10c0-2 2-2 2-4" stroke="#F5EAD8" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BESTSELLER -->
+      <section id="bestsellerSection" class="mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-display font-bold text-espresso text-lg sec-title">Menu Favorit Alegre</h3>
+          <span class="text-xs text-caramel bg-honey/10 border border-honey/22 px-2.5 py-1 rounded-full font-semibold">★ Terpopuler</span>
+        </div>
+        <div id="bestsellerList" class="scroll-x flex gap-3 overflow-x-auto pb-2"></div>
+      </section>
+
+      <hr class="dashed mb-6">
+
+      <!-- MENU GRID -->
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-bold text-espresso text-lg sec-title" id="menuSectionTitle">Semua Menu</h3>
+          <span id="menuCount" class="text-xs text-mocha/50 bg-cream px-2.5 py-1 rounded-full border border-latte/28"></span>
+        </div>
+        <div id="noResult" class="hidden text-center py-14">
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" class="mx-auto mb-4 opacity-25"><circle cx="22" cy="22" r="15" stroke="#7B4A2D" stroke-width="2"/><path d="m33 33 8 8" stroke="#7B4A2D" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="22" x2="28" y2="22" stroke="#7B4A2D" stroke-width="2" stroke-linecap="round"/></svg>
+          <p class="text-mocha font-medium">Menu tidak ditemukan</p>
+          <p class="text-mocha/40 text-sm mt-1">Coba kata kunci lain</p>
+        </div>
+      <div id="menuGrid" class="
+        grid 
+        grid-cols-2 
+        sm:grid-cols-2 
+        md:grid-cols-3 
+        lg:grid-cols-3 
+        xl:grid-cols-4 
+        gap-3 
+        sm:gap-4 
+        lg:gap-5
+      "></div>
+      </section>
+
+      <hr class="dashed my-8">
+
+      <!-- ABOUT -->
+      <section class="mb-6">
+        <div class="about-bg rounded-3xl overflow-hidden p-6 lg:p-8 relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(201,154,90,.11) 0%,transparent 65%);"></div>
+          <div class="relative z-10 lg:flex lg:gap-10 lg:items-start">
+            <div class="lg:flex-1">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,154,90,.13);">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="10" width="13" height="9" rx="2.5" fill="#C99A5A" opacity=".85"/><path d="M16 12h2a2 2 0 010 4h-2" stroke="#C99A5A" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-foam text-lg leading-tight">Tentang Alegre Coffee</h3>
+                  <p class="text-latte/45 text-xs">Est. Sejak Lama 🖤</p>
+                </div>
+              </div>
+              <p class="text-latte/72 text-sm leading-relaxed mb-5">Alegre Coffee hadir dengan semangat menyajikan cita rasa kopi terbaik dalam suasana yang hangat dan nyaman. Dari espresso klasik hingga kreasi signature kami, setiap tegukan adalah sebuah pengalaman.</p>
+              <div class="flex gap-2 flex-wrap">
+                <a href="https://wa.me/6285726685074" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold active:scale-95" style="background:rgba(37,211,102,.13);color:#25D366;border:1px solid rgba(37,211,102,.22);">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  WhatsApp
+                </a>
+                <a href="https://instagram.com/alegrecoffee" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style="background:rgba(201,154,90,.1);color:#C99A5A;border:1px solid rgba(201,154,90,.18);">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  Instagram
+                </a>
+              </div>
+            </div>
+            <div class="mt-5 lg:mt-0 lg:w-52 flex-shrink-0">
+              <div class="bg-white/6 rounded-2xl p-4 border border-white/9">
+                <p class="text-honey text-[10px] font-bold tracking-widest uppercase mb-3">Jam Operasional</p>
+                <div class="space-y-2">
+                  <div class="flex justify-between text-sm"><span class="text-latte/60">Senin – Jumat</span><span class="text-foam font-semibold">08:00–22:00</span></div>
+                  <div class="flex justify-between text-sm"><span class="text-latte/60">Sabtu – Minggu</span><span class="text-foam font-semibold">09:00–23:00</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAPS -->
+      <section class="mb-6">
+        <h3 class="font-display font-bold text-espresso text-lg sec-title mb-3">Lokasi Kami</h3>
+        <div class="rounded-3xl overflow-hidden border border-latte/22 shadow-sm" style="height:215px;">
+          <iframe src="https://maps.google.com/maps?q=Alegre+Coffee&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </section>
+
+      <p class="text-center text-mocha/30 text-xs pb-4">© 2026 Alegre Coffee • Digital Menu</p>
+    </div>
+  </div>
+</div>
+
+<!-- FLOAT BUTTON (mobile only) -->
+<div class="float-mobile fixed bottom-5 left-0 right-0 flex justify-center z-50 px-4 lg:hidden">
+  <button id="floatBtn" onclick="openCart()" class="float-wa flex items-center gap-2.5 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm w-full max-w-xs justify-center">
+    <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span id="floatBtnText">Lihat Keranjang</span>
+    <span id="floatBadge" class="hidden badge-pulse bg-white text-green-700 font-bold text-xs px-2 py-0.5 rounded-full">0</span>
+  </button>
+</div>
+
+<script>
+// ── SVG ILLUSTRATIONS ──
+const ILLUS={
+  'espresso':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="22" y="38" width="34" height="28" rx="7" fill="white" opacity=".1"/><path d="M56 44h8a8 8 0 010 16h-8" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".35"/><rect x="30" y="66" width="18" height="4" rx="2" fill="white" opacity=".12"/><ellipse cx="39" cy="38" rx="12" ry="4.5" fill="white" opacity=".15"/><path d="M30 32c0-3 3-3 3-6M39 32c0-3 3-3 3-6M48 32c0-3 3-3 3-6" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".22"/><circle cx="39" cy="50" r="7" fill="white" opacity=".05"/><circle cx="39" cy="50" r="3" fill="white" opacity=".07"/></svg>`,
+  'creamy-coffee':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="19" y="34" width="40" height="36" rx="8" fill="white" opacity=".08"/><ellipse cx="39" cy="34" rx="16" ry="6" fill="white" opacity=".2"/><path d="M24 44c3-2.5 7 2 11 0s7-2.5 11 0 7 2.5 11 0" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".28"/><path d="M24 52c3-2 7 1.5 11 0s7-2 11 0 7 1.5 11 0" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".18"/><rect x="30" y="70" width="18" height="4" rx="2" fill="white" opacity=".12"/><circle cx="39" cy="22" r="5" fill="white" opacity=".1"/><path d="M39 27v7" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".12"/></svg>`,
+  'non-coffee':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="18" y="30" width="42" height="38" rx="8" fill="white" opacity=".08"/><path d="M60 38h6a6 6 0 010 12h-6" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".28"/><ellipse cx="39" cy="30" rx="16" ry="6" fill="white" opacity=".18"/><rect x="30" y="68" width="18" height="4" rx="2" fill="white" opacity=".1"/><line x1="28" y1="46" x2="50" y2="46" stroke="white" stroke-width="1.8" opacity=".14"/><line x1="26" y1="54" x2="52" y2="54" stroke="white" stroke-width="1.8" opacity=".09"/><circle cx="39" cy="43" r="8" fill="white" opacity=".05"/></svg>`,
+  'refresher':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><path d="M27 28l5 42h14l5-42H27z" fill="white" opacity=".08"/><path d="M25 28h28" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".28"/><path d="M39 17v11" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".35"/><circle cx="52" cy="20" r="5" fill="white" opacity=".12"/><path d="M39 17c0 0 5-4 5-8" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".2"/><path d="M30 40c2.5 1.5 6-1.5 9 0s6 1.5 9 0" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".18"/><ellipse cx="39" cy="52" rx="9" ry="12" fill="white" opacity=".04"/></svg>`,
+  'frappe':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><path d="M24 34l6 38h18l6-38H24z" fill="white" opacity=".08"/><path d="M22 34h34" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".26"/><ellipse cx="39" cy="27" rx="16" ry="7" fill="white" opacity=".16"/><path d="M23 27c4-3 8 2 11-1s7-3 10 0 7 3 10-1" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".26"/><path d="M39 11v16" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".2"/><circle cx="50" cy="14" r="4" fill="white" opacity=".15"/><path d="M30 46c3-2 6 1.5 9-.5s6-1.5 9 0" stroke="white" stroke-width="1.8" opacity=".16"/></svg>`,
+  'signature':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="26" y="24" width="30" height="46" rx="8" fill="white" opacity=".08"/><rect x="30" y="28" width="22" height="38" rx="6" fill="white" opacity=".05"/><rect x="26" y="20" width="30" height="9" rx="4.5" fill="white" opacity=".16"/><rect x="26" y="70" width="30" height="5" rx="2.5" fill="white" opacity=".08"/><path d="M35 42l2.5 2.5 6-6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".32"/><path d="M35 54h12M35 60h8" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".18"/><circle cx="57" cy="22" r="7" fill="white" opacity=".12"/><path d="M54.5 22h5M57 19.5v5" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".38"/></svg>`,
+  'food':`<svg width="90" height="90" viewBox="0 0 90 90" fill="none"><circle cx="42" cy="52" r="24" fill="white" opacity=".06"/><circle cx="42" cy="52" r="16" fill="white" opacity=".05"/><path d="M18 74h48" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".22"/><path d="M30 52c0-7 5-12 12-12s12 5 12 12" stroke="white" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".26"/><path d="M24 20v14M24 16v2" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".28"/><path d="M33 16c0 0 0 5-2.5 7.5S28 32 28 34" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".18"/><path d="M58 16v18" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".26"/><path d="M52 16h12M52 22h12M52 28h12" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".18"/></svg>`,
+};
+
+const CAT_GRAD={
+  'espresso':    ['#160800','#3D1A06','#6B3012'],
+  'creamy-coffee':['#280E00','#5C2C12','#8C4A26'],
+  'non-coffee':  ['#081408','#163020','#224832'],
+  'refresher':   ['#080A22','#141840','#202A6A'],
+  'frappe':      ['#060B1C','#0E1832','#182850'],
+  'signature':   ['#160E00','#3E2800','#704800'],
+  'food':        ['#180606','#3E1010','#6A1A1A'],
+};
+
+const CAT_LABELS={'espresso':'Espresso Based','creamy-coffee':'Creamy Coffee','non-coffee':'Non Coffee','refresher':'Refresher','frappe':'Frappe','signature':'Signature','food':'Food & Dessert'};
+
+const SIDEBAR_ICON={
+  'all':`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
+  'espresso':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><rect x="3" y="10" width="13" height="9" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M16 12h2a2 2 0 010 4h-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  'creamy-coffee':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><rect x="3" y="8" width="16" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/><ellipse cx="11" cy="8" rx="6" ry="2.5" stroke="currentColor" stroke-width="1.6"/></svg>`,
+  'non-coffee':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><path d="M4 6l2 14h10l2-14H4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 6h16M11 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  'refresher':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><path d="M7 4l1.5 15h5L15 4H7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 4h10M11 1v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  'frappe':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><path d="M5 8l2 12h8l2-12H5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><ellipse cx="11" cy="6" rx="6" ry="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M11 1v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  'signature':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><rect x="5" y="6" width="12" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/><rect x="5" y="4" width="12" height="4" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 12l1.5 1.5L14 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  'food':`<svg width="14" height="14" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="13" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M5 19h12M7 5v5M7 3v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15 3v8M12 3h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+};
+
+// ── MENU DATA ──
+const MENU=[
+  {id:1,name:"Espresso",price:20000,desc:"Short shot of bold, concentrated espresso.",cat:"espresso",isBestSeller:false, image:"img/espresso.jpg"},
+  {id:2,name:"Americano",price:23000,desc:"Espresso diluted with hot water — smooth and bold.",cat:"espresso",isBestSeller:true, image:"img/americano.jpg"},
+  {id:3,name:"Mochachino",price:28000,desc:"Rich espresso blended with chocolate and steamed milk.",cat:"espresso",isBestSeller:true, image:"img/mochachino.jpg"},
+  {id:4,name:"Cappuccino",price:25000,desc:"Equal parts espresso, steamed milk and velvety foam.",cat:"espresso",isBestSeller:false, image:"img/cappuccino.jpg"},
+  {id:5,name:"Magic",price:25000,desc:"Double ristretto with cold milk — smooth and magical.",cat:"espresso",isBestSeller:true},
+  {id:6,name:"Latte",price:25000,desc:"Espresso with generous steamed milk and light foam.",cat:"espresso",isBestSeller:false},
+  {id:7,name:"Pandan Cream Latte",price:25000,desc:"Sweet, creamy, smooth pandan aroma.",cat:"creamy-coffee",isBestSeller:true},
+  {id:8,name:"Blossom Cream Latte",price:25000,desc:"Creamy, soft with floral scent.",cat:"creamy-coffee",isBestSeller:false},
+  {id:9,name:"Banana Cream Latte",price:25000,desc:"Creamy, thick with sweet banana.",cat:"creamy-coffee",isBestSeller:true},
+  {id:10,name:"Seasalt Caramel Latte",price:25000,desc:"Creamy, smooth with sweet caramel.",cat:"creamy-coffee",isBestSeller:true},
+  {id:11,name:"Macademia Cream Latte",price:25000,desc:"Creamy, rich nutty flavor.",cat:"creamy-coffee",isBestSeller:false},
+  {id:12,name:"Chewy Candy Latte",price:25000,desc:"Creamy, sweet and candy like flavour.",cat:"creamy-coffee",isBestSeller:false},
+  {id:13,name:"Vanilla Cream Latte",price:25000,desc:"Sweet vanilla and creamy.",cat:"creamy-coffee",isBestSeller:false},
+  {id:14,name:"Irish Peanut Latte",price:25000,desc:"Nutty, thick and creamy.",cat:"creamy-coffee",isBestSeller:false},
+  {id:15,name:"Classic Matcha",price:25000,desc:"Earthy and slightly bitter matcha flavor.",cat:"non-coffee",isBestSeller:false},
+  {id:16,name:"Classic Redvelvet",price:25000,desc:"Creamy, smooth and rich velvety.",cat:"non-coffee",isBestSeller:false},
+  {id:17,name:"Classic Chocolate",price:25000,desc:"Rich and creamy with a sweet chocolatey taste.",cat:"non-coffee",isBestSeller:false},
+  {id:18,name:"Swiss Choco Cream",price:25000,desc:"Rich and deep chocolate flavor.",cat:"non-coffee",isBestSeller:false},
+  {id:19,name:"Matcha Salted Cream",price:25000,desc:"Creamy, smooth rich matcha with a hint of saltiness.",cat:"non-coffee",isBestSeller:true},
+  {id:20,name:"Redcurrant Matcha",price:25000,desc:"Creamy, smooth with a refreshing bite.",cat:"non-coffee",isBestSeller:false},
+  {id:21,name:"Tanggo Ester Cream",price:25000,desc:"Creamy, smooth with a crunchy feel.",cat:"non-coffee",isBestSeller:false},
+  {id:22,name:"Baileys Velvet Cake",price:25000,desc:"Creamy with a sweet, smooth red velvet flavor.",cat:"non-coffee",isBestSeller:false},
+  {id:23,name:"Choco Crunch Berry",price:25000,desc:"Creamy, with a choco wafer on it.",cat:"non-coffee",isBestSeller:false},
+  {id:24,name:"Coffeetonic No.1",price:28000,desc:"Berry sweet and sour with coffee.",cat:"refresher",isBestSeller:true},
+  {id:25,name:"Capri Sour",price:28000,desc:"Smooth and sweet rich of flavor.",cat:"refresher",isBestSeller:false},
+  {id:26,name:"Maradas Garden",price:28000,desc:"Strawberry, sour, sweet with coffee.",cat:"refresher",isBestSeller:false},
+  {id:27,name:"Vers Roze",price:28000,desc:"Sweet, fresh, bubble gum.",cat:"refresher",isBestSeller:false},
+  {id:28,name:"Sangria Temple",price:28000,desc:"Salty berry.",cat:"refresher",isBestSeller:false},
+  {id:29,name:"Post Blue",price:28000,desc:"Smooth and sweet with soda bintang.",cat:"refresher",isBestSeller:false},
+  {id:30,name:"Havana Twist",price:28000,desc:"Sour smooth sweet.",cat:"refresher",isBestSeller:false},
+  {id:31,name:"Maldives",price:28000,desc:"Fresh, light, fruity sweet.",cat:"refresher",isBestSeller:false},
+  {id:32,name:"Violet Oracle",price:28000,desc:"Fresh light and mint with pea tea.",cat:"refresher",isBestSeller:false},
+  {id:33,name:"Las Pozas",price:28000,desc:"Cucumber, spinach, pineapple.",cat:"refresher",isBestSeller:false},
+  {id:34,name:"Sun Sipper",price:28000,desc:"Orange, mango, lemon.",cat:"refresher",isBestSeller:false},
+  {id:35,name:"Red Burst",price:28000,desc:"Dragonfruit, apple, lemon.",cat:"refresher",isBestSeller:false},
+  {id:36,name:"Matcha Zen Frappe",price:30000,desc:"Rich and deep matcha flavor.",cat:"frappe",isBestSeller:false},
+  {id:37,name:"Choco Bliss Frappe",price:30000,desc:"Rich and deep chocolate.",cat:"frappe",isBestSeller:false},
+  {id:38,name:"Velvet Delight Frappe",price:30000,desc:"Sweet with a hint of velvet and slightly tangy.",cat:"frappe",isBestSeller:false},
+  {id:39,name:"Caramel Blue Swirl Frappe",price:30000,desc:"Sweet caramel with a fruity twist.",cat:"frappe",isBestSeller:false},
+  {id:40,name:"Special Bottle — Barrel",price:30000,desc:"Coffee blends: palm sugar, corn, honey. Signature bottle.",cat:"signature",isBestSeller:true},
+  {id:41,name:"Special Bottle — Layered",price:30000,desc:"Creamy blends: chocolate creamy. Signature bottle.",cat:"signature",isBestSeller:false},
+  {id:42,name:"Special Bottle — Vibrance",price:30000,desc:"Coconut, passion fruit, honey. Signature bottle.",cat:"signature",isBestSeller:false},
+  {id:43,name:"Chicken Vert Salad",price:35000,desc:"Vegetables, chicken marinated with caesar dressing.",cat:"food",isBestSeller:false},
+  {id:44,name:"Beef Tomato Salad",price:35000,desc:"Vegetables, beef meat with vietnamese dressing.",cat:"food",isBestSeller:false},
+  {id:45,name:"Beef Corn Croissant",price:38000,desc:"Croissant beef sausage, creamy mushroom corn sauce, french fries.",cat:"food",isBestSeller:true},
+  {id:46,name:"Smoked Chicken Burger",price:35000,desc:"Crispy chicken breast, smokey BBQ sauce, french fries.",cat:"food",isBestSeller:false},
+  {id:47,name:"Big Brunch Breakfast",price:38000,desc:"Two eggs, sourdough, salad, french fries, smoked beef, mushroom.",cat:"food",isBestSeller:true},
+  {id:48,name:"Burrito Loco Hotdog",price:35000,desc:"Beef sausage, honey mustard mayo sauce, french fries, cheese slice.",cat:"food",isBestSeller:false},
+  {id:49,name:"Fried Chicken Benedict",price:35000,desc:"Sourdough, crispy chicken breast, holandise sauce, french fries.",cat:"food",isBestSeller:false},
+  {id:50,name:"Classic Cheese Burger",price:38000,desc:"Burger, patty, tomato, cheese slice, egg, french fries.",cat:"food",isBestSeller:false},
+  {id:51,name:"Classic Eggs Florentine",price:35000,desc:"Sourdough, salad, pouched egg, holandise sauce, french fries.",cat:"food",isBestSeller:false},
+  {id:52,name:"Truffle Scramble Sourdough",price:38000,desc:"Sourdough, salad, scramble egg, holandise sauce, french fries.",cat:"food",isBestSeller:false},
+  {id:53,name:"Chiken Mayo Croissant",price:35000,desc:"Crunchy chicken breast, houseblend mayo, salad, french fries.",cat:"food",isBestSeller:false},
+  {id:54,name:"Beef Spices Hotdog",price:35000,desc:"Beef sausage, spicy BBQ sauce, french fries.",cat:"food",isBestSeller:false},
+  {id:55,name:"Truffle Mushroom Carbonara",price:30000,desc:"Creamy carbonara pasta, smoked beef with truffle oil.",cat:"food",isBestSeller:false},
+  {id:56,name:"Seafood Creme Fettucino",price:30000,desc:"Bell pepper creamy pasta with seafood shrimp and squid.",cat:"food",isBestSeller:false},
+  {id:57,name:"Asian Chicken Olio",price:30000,desc:"Spiced spaghetti with marinated chicken.",cat:"food",isBestSeller:false},
+  {id:58,name:"Prawn Pesto Olio",price:30000,desc:"Tasty pesto spaghetti with shrimp.",cat:"food",isBestSeller:false},
+  {id:59,name:"Chicken Spices Rice",price:33000,desc:"Sesame nori rice, sambal matah, chicken gochujang sauce.",cat:"food",isBestSeller:false},
+  {id:60,name:"Smoked Chicken Rice",price:33000,desc:"Sesame nori rice, egg, salad, chicken BBQ sauce.",cat:"food",isBestSeller:false},
+  {id:61,name:"Beef Curry Rice",price:33000,desc:"Rice, salad, curry soup and beef.",cat:"food",isBestSeller:false},
+  {id:62,name:"Creamy Chicken Steak",price:38000,desc:"Chicken breast, creamy mushroom sauce, salad, french fries.",cat:"food",isBestSeller:true},
+  {id:63,name:"Red Smoke Beef Steak",price:80000,desc:"Meltique beef, smokey BBQ sauce, salad, french fries.",cat:"food",isBestSeller:true},
+  {id:64,name:"Buttered Fish & Chips",price:35000,desc:"Crispy buttered fish fillet with french fries.",cat:"food",isBestSeller:false},
+  {id:65,name:"Beer Butter Onion",price:28000,desc:"Beer-battered crispy onion rings.",cat:"food",isBestSeller:false},
+  {id:66,name:"Truffle Spices Fries",price:35000,desc:"Crispy fries tossed with truffle oil and spices.",cat:"food",isBestSeller:false},
+  {id:67,name:"Platter Bigger Snack",price:38000,desc:"Mixed platter of crispy snacks — perfect for sharing.",cat:"food",isBestSeller:false},
+  {id:68,name:"Sweet Brioche French Toast",price:35000,desc:"French toast, ice cream, caramel sauce, strawberry, cinnamon.",cat:"food",isBestSeller:true},
+  {id:69,name:"Affogato",price:25000,desc:"Two scoops of ice cream, espresso, lotus biscuit.",cat:"food",isBestSeller:true},
+  {id:70,name:"Cookies",price:15000,desc:"Matcha / Red Velvet / Double Choco Peanut / Choco Chips / Cream Cheese.",cat:"food",isBestSeller:false},
+];
+
+
+const IMG_MAP = {
+  'espresso': 'https://source.unsplash.com/400x300/?espresso',
+  'creamy-coffee': 'https://source.unsplash.com/400x300/?latte',
+  'non-coffee': 'https://source.unsplash.com/400x300/?matcha',
+  'refresher': 'https://source.unsplash.com/400x300/?juice',
+  'frappe': 'https://source.unsplash.com/400x300/?frappe',
+  'signature': 'https://source.unsplash.com/400x300/?coffee-bottle',
+  'food': 'https://source.unsplash.com/400x300/?food'
+};
+
+// ── STATE ──
+const urlP=new URLSearchParams(window.location.search);
+const tableNumber=urlP.get('table')||'-';
+let customerName=localStorage.getItem('alegre_name')||'';
+let cart={};
+
+function fmtPrice(n){return'Rp '+n.toLocaleString('id-ID');}
+function grad(cat){const g=CAT_GRAD[cat]||['#160800','#3D1A06','#6B3012'];return`linear-gradient(145deg,${g[0]},${g[1]},${g[2]})`;}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
+  ['tableNumDisplay','sidebarMeja'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tableNumber;});
+  document.getElementById('mobileTableText').textContent=tableNumber==='-'?'Meja -':'Meja '+tableNumber;
+  document.getElementById('cartMeja').textContent=tableNumber;
+  if(customerName){document.getElementById('cartNama').textContent=customerName;const sn=document.getElementById('sidebarNama');if(sn)sn.textContent=customerName;const bn=document.getElementById('bannerNama'); if(bn)bn.textContent=customerName;}
+  else{setTimeout(()=>document.getElementById('nameModal').classList.remove('hidden'),300);}
+  buildNav();renderBestsellers();renderMenu(MENU);updateBadges();
+});
+
+// ── NAV ──
+function buildNav(){
+  const cats=[{id:'all',label:'Semua Menu'},...Object.keys(CAT_LABELS).map(k=>({id:k,label:CAT_LABELS[k]}))];
+  const sn=document.getElementById('sidebarNav');
+  if(sn)sn.innerHTML=cats.map(c=>`<div class="sidebar-pill${c.id==='all'?' active':''}" data-cat="${c.id}" onclick="filterCat('${c.id}',this)"><span class="opacity-60">${SIDEBAR_ICON[c.id]||''}</span><span>${c.label}</span><span class="ml-auto text-[10px] opacity-35">${c.id==='all'?MENU.length:MENU.filter(m=>m.cat===c.id).length}</span></div>`).join('');
+  const mt=document.getElementById('mobileCatTabs');
+  if(mt)mt.innerHTML=cats.map(c=>`<button class="cat-pill${c.id==='all'?' active':''} text-xs font-semibold px-4 py-2 rounded-full ${c.id==='all'?'bg-bark text-cream':'bg-white/10 text-latte border border-white/10'}" data-cat="${c.id}" onclick="filterCat('${c.id}',this)">${c.label}</button>`).join('');
+}
+
+// ── FILTER ──
+function filterCat(cat,el){
+  document.querySelectorAll('.sidebar-pill').forEach(p=>p.classList.toggle('active',p.dataset.cat===cat));
+  document.querySelectorAll('#mobileCatTabs .cat-pill').forEach(p=>{
+    const a=p.dataset.cat===cat;p.classList.toggle('active',a);
+    p.classList.toggle('bg-white/10',!a);p.classList.toggle('text-latte',!a);p.classList.toggle('border',!a);p.classList.toggle('border-white/10',!a);
+    p.classList.toggle('bg-bark',a);p.classList.toggle('text-cream',a);
+  });
+  const filtered=cat==='all'?MENU:MENU.filter(m=>m.cat===cat);
+  document.getElementById('menuSectionTitle').textContent=cat==='all'?'Semua Menu':(CAT_LABELS[cat]||cat);
+  document.getElementById('bestsellerSection').style.display=cat==='all'?'':'none';
+  renderMenu(filtered);
+  if(el&&el.closest('#mobileCatTabs'))document.getElementById('menuSectionTitle').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── SEARCH ──
+function toggleSearch(){const b=document.getElementById('mobileSearchBar');b.classList.toggle('hidden');if(!b.classList.contains('hidden'))setTimeout(()=>document.getElementById('mobileSearch').focus(),80);}
+function clearSearch(){['mobileSearch','desktopSearch'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});handleSearch('');}
+function handleSearch(q){
+  const sq=q.toLowerCase().trim();
+  const f=MENU.filter(m=>m.name.toLowerCase().includes(sq)||m.desc.toLowerCase().includes(sq));
+  document.getElementById('menuSectionTitle').textContent=q?`Hasil: "${q}"`:'Semua Menu';
+  document.getElementById('bestsellerSection').style.display=q?'none':'';
+  renderMenu(f);
+}
+
+// ── BESTSELLERS ──
+function renderBestsellers(){
+  document.getElementById('bestsellerList').innerHTML=MENU.filter(m=>m.isBestSeller).map(item=>`
+    <div class="bs-card" onclick="addToCart(${item.id})" style="background:${grad(item.cat)};">
+      <div class="illus-wrap" style="height:100px;"><img 
+  src="${item.image || IMG_MAP[item.cat]}" 
+  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+  class="w-full h-full object-cover"
+/>
+
+<div class="illus-wrap hidden absolute inset-0 items-center justify-center">
+  ${ILLUS[item.cat] || ''}
+</div></div>
+      <div class="p-3">
+        <div class="flex items-start justify-between gap-1 mb-1">
+          <h4 class="font-display font-semibold text-foam text-xs leading-tight flex-1">${item.name}</h4>
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style="background:rgba(201,154,90,.22);color:#C99A5A;">★ FAV</span>
+        </div>
+        <p class="text-latte/50 text-[10px] leading-snug mb-2 line-clamp-2">${item.desc}</p>
+        <div class="flex items-center justify-between">
+          <span class="text-honey font-bold text-xs">${fmtPrice(item.price)}</span>
+          <span id="bsBadge-${item.id}" class="hidden text-[9px] font-bold px-1.5 py-0.5 rounded-full" style="background:rgba(201,154,90,.18);color:#C99A5A;"></span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── MENU GRID ──
+function renderMenu(items){
+  const grid=document.getElementById('menuGrid');
+  const noRes=document.getElementById('noResult');
+  document.getElementById('menuCount').textContent=items.length+' menu';
+  
+  if(!items.length){grid.innerHTML='';noRes.classList.remove('hidden');return;}
+  
+  noRes.classList.add('hidden');
+  grid.innerHTML=items.map(item=>{
+    const qty=cart[item.id]||0;
+    // 1. Ambil foto spesifik atau dari mapping kategori
+    const itemImg = item.image || IMG_MAP[item.cat]; 
+    
+    return`<div class="menu-card" id="card-${item.id}">
+      <div class="illus-wrap relative" style="height:110px; background:${grad(item.cat)}; overflow:hidden;">
+        
+        <img src="${itemImg}" 
+             class="w-full h-full object-cover absolute inset-0 opacity-90" 
+             onerror="this.style.display='none'">
+
+        <div class="relative z-10 flex items-center justify-center h-full opacity-30 pointer-events-none">
+           ${ILLUS[item.cat]||''}
+        </div>
+
+        ${item.isBestSeller?`<span class="absolute top-2 left-2 z-20 text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:rgba(201,154,90,.88);color:#1A0A00;">★ FAVORIT</span>`:''}
+        <span class="absolute top-2 right-2 z-20 in-cart-badge${qty>0?'':' hidden'}" id="cardBadge-${item.id}">${qty>0?'×'+qty:''}</span>
+      </div>
+      
+      <div class="p-3">
+        <h4 class="font-display font-semibold text-espresso text-sm leading-tight mb-0.5">${item.name}</h4>
+        <p class="text-mocha/50 text-[10px] leading-snug mb-2 line-clamp-2">${item.desc}</p>
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-bark font-bold text-sm">${fmtPrice(item.price)}</span>
+          <span class="text-[9px] text-mocha/40 bg-foam px-1.5 py-0.5 rounded-full border border-latte/18">${CAT_LABELS[item.cat]||item.cat}</span>
+        </div>
+        <div class="ctrl-area">${buildCtrl(item.id,qty)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildCtrl(id,qty){
+  if(qty>0)return`<div class="flex items-center gap-1.5"><button class="qty-btn bg-cream text-bark border border-latte/32 hover:bg-latte" onclick="changeQty(${id},-1)">−</button><span class="font-bold text-espresso text-sm w-5 text-center">${qty}</span><button class="qty-btn bg-bark text-cream hover:bg-espresso" onclick="changeQty(${id},1)">+</button><button class="add-btn added flex-1 py-2 rounded-xl text-[10px] font-bold text-center" onclick="changeQty(${id},1)">✓ Ditambah</button></div>`;
+  return`<button class="add-btn w-full py-2.5 rounded-xl text-xs font-semibold border border-bark/22 text-bark hover:bg-bark hover:text-cream" onclick="addToCart(${id})">+ Tambah ke Pesanan</button>`;
+}
+
+// ── CART ──
+function addToCart(id){
+  if(!customerName){
+    if(document.getElementById('nameModal').classList.contains('hidden')){
+      document.getElementById('nameModal').classList.remove('hidden');
+    }
+    return;
+  }
+  cart[id]=(cart[id]||0)+1;
+  const item=MENU.find(m=>m.id===id);
+  showToast(item.name+' ditambahkan ke keranjang');
+  updateBadges();updateBsBadge(id);refreshCard(id);
+}
+function changeQty(id,d){
+  cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];
+  updateBadges();updateBsBadge(id);refreshCard(id);
+  if(!document.getElementById('cartModal').classList.contains('hidden'))renderCartItems();
+}
+function refreshCard(id){
+  const qty=cart[id]||0;
+  const card=document.getElementById('card-'+id);if(!card)return;
+  const ca=card.querySelector('.ctrl-area');if(ca)ca.innerHTML=buildCtrl(id,qty);
+  const b=document.getElementById('cardBadge-'+id);
+  if(b){if(qty>0){b.textContent='×'+qty;b.classList.remove('hidden');}else b.classList.add('hidden');}
+}
+function updateBsBadge(id){
+  const b=document.getElementById('bsBadge-'+id);if(!b)return;
+  const qty=cart[id]||0;if(qty>0){b.textContent='×'+qty;b.classList.remove('hidden');}else b.classList.add('hidden');
+}
+function clearCart(){cart={};updateBadges();renderCartItems();MENU.forEach(m=>{refreshCard(m.id);updateBsBadge(m.id);});}
+function updateBadges(){
+  const total=Object.values(cart).reduce((a,b)=>a+b,0);
+  ['mobileCartBadge','desktopCartBadge'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=total;el.classList.toggle('hidden',!total);}});
+  const fb=document.getElementById('floatBadge');const ft=document.getElementById('floatBtnText');
+  if(fb){fb.textContent=total;fb.classList.toggle('hidden',!total);}
+  if(ft)ft.textContent=total>0?`Pesan Sekarang (${total} item)`:'Lihat Keranjang';
+}
+
+// ── CART MODAL ──
+function openCart(){
+  if(!customerName){document.getElementById('nameModal').classList.remove('hidden');return;}
+  document.getElementById('cartModal').classList.remove('hidden');
+  document.getElementById('cartMeja').textContent=tableNumber;
+  document.getElementById('cartNama').textContent=customerName;
+  renderCartItems();
+}
+function closeCart(){document.getElementById('cartModal').classList.add('hidden');}
+function renderCartItems(){
+  const container=document.getElementById('cartItems');
+  const empty=document.getElementById('cartEmpty');
+  const footer=document.getElementById('cartFooter');
+  const ids=Object.keys(cart).map(Number);
+  if(!ids.length){container.innerHTML='';empty.classList.remove('hidden');footer.classList.add('hidden');return;}
+  empty.classList.add('hidden');footer.classList.remove('hidden');
+  let total=0;
+  container.innerHTML=ids.map(id=>{
+    const item=MENU.find(m=>m.id===id);const qty=cart[id];const sub=item.price*qty;total+=sub;
+    return`<div class="flex items-center gap-3 bg-white rounded-2xl p-3 border border-latte/18">
+      <div class="w-11 h-11 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden" style="background:${grad(item.cat)};">
+        <div style="transform:scale(.5) translateY(-3px);">${ILLUS[item.cat]||''}</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-espresso font-semibold text-sm leading-tight truncate">${item.name}</p>
+        <p class="text-mocha/45 text-xs mt-0.5">${fmtPrice(item.price)}</p>
+      </div>
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <button class="qty-btn bg-cream text-bark border border-latte/28" onclick="changeQty(${id},-1)">−</button>
+        <span class="font-bold text-espresso text-sm w-5 text-center">${qty}</span>
+        <button class="qty-btn bg-bark text-cream" onclick="changeQty(${id},1)">+</button>
+      </div>
+      <div class="w-16 text-right flex-shrink-0"><p class="text-bark font-bold text-sm">${fmtPrice(sub)}</p></div>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent=fmtPrice(total);
+}
+
+// ── WHATSAPP ──
+function orderViaWhatsApp(){
+  const ids=Object.keys(cart).map(Number);
+  if(!ids.length){showToast('Tambahkan menu dulu!');return;}
+  if(!customerName){document.getElementById('nameModal').classList.remove('hidden');return;}
+  const lines=ids.map(id=>{const item=MENU.find(m=>m.id===id);return`  - ${item.name} x${cart[id]} = ${fmtPrice(item.price*cart[id])}`;}).join('\n');
+  const total=ids.reduce((s,id)=>s+MENU.find(m=>m.id===id).price*cart[id],0);
+  const msg=`Halo Alegre Coffee, saya mau pesan:\n\nNama: ${customerName}\nMeja: ${tableNumber}\n\nPesanan:\n${lines}\n\nTotal: ${fmtPrice(total)}\n\nTerima kasih 🙏`;
+  window.open(`https://wa.me/6285726685074?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ── SAVE NAME ──
+function saveName(){
+  const val=document.getElementById('customerNameInput').value.trim();
+  if(!val){document.getElementById('nameError').classList.remove('hidden');return;}
+  customerName=val;localStorage.setItem('alegre_name',val);
+  document.getElementById('cartNama').textContent=val;
+  const sn=document.getElementById('sidebarNama');if(sn)sn.textContent=val;
+  const bn=document.getElementById('bannerNama'); if(bn)bn.textContent=val;
+  document.getElementById('nameModal').classList.add('hidden');
+  showToast('Halo '+val+'! Silakan pilih menu 😊');
+}
+
+// ── TOAST ──
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastIcon').innerHTML=`<svg width="13" height="13" fill="none" stroke="#C99A5A" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.remove('hidden');t.classList.add('toast-in');
+  clearTimeout(toastT);toastT=setTimeout(()=>{t.classList.add('hidden');t.classList.remove('toast-in');},2600);
+}
+
+document.getElementById('cartModal').addEventListener('click',function(e){if(e.target===this)closeCart();});
+</script>
+</body>
+</html>

@@ -500,40 +500,75 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.25;z
 
       <!-- ABOUT -->
       <section class="mb-6">
-        <div class="about-bg rounded-3xl overflow-hidden p-6 lg:p-8 relative">
-          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(201,154,90,.11) 0%,transparent 65%);"></div>
-          <div class="relative z-10 lg:flex lg:gap-10 lg:items-start">
-            <div class="lg:flex-1">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,154,90,.13);">
-                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="10" width="13" height="9" rx="2.5" fill="#C99A5A" opacity=".85"/><path d="M16 12h2a2 2 0 010 4h-2" stroke="#C99A5A" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-                </div>
-                <div>
-                  <h3 class="font-display font-bold text-foam text-lg leading-tight">Tentang Alegre Coffee</h3>
-                  <p class="text-latte/45 text-xs">Est. Sejak Lama 🖤</p>
-                </div>
+        <div class="rounded-3xl overflow-hidden" style="background:#1A0A00; padding:28px 20px 24px; position:relative;">
+          
+          <!-- decorative rings -->
+          <div style="position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(201,154,90,0.1);top:-80px;right:-60px;pointer-events:none;"></div>
+          <div style="position:absolute;width:140px;height:140px;border-radius:50%;border:1px solid rgba(201,154,90,0.07);top:-30px;right:20px;pointer-events:none;"></div>
+
+          <!-- brand row -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;position:relative;z-index:2;">
+            <div style="width:44px;height:44px;background:rgba(201,154,90,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <img src="img/logo.jpg" alt="Logo" style="width:28px;height:28px;object-fit:cover;border-radius:8px;">
+            </div>
+            <div>
+              <p class="font-display font-bold text-foam" style="font-size:17px;line-height:1.2;">Alegre Coffee</p>
+              <p style="font-size:10px;color:rgba(212,184,150,0.4);letter-spacing:0.08em;">Sidoarjo • Est. 2020</p>
+            </div>
+          </div>
+
+          <!-- open badge -->
+          <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.2);border-radius:999px;padding:3px 10px 3px 7px;font-size:10px;font-weight:600;color:#25D366;margin-bottom:14px;position:relative;z-index:2;">
+            <span style="width:6px;height:6px;background:#25D366;border-radius:50%;display:inline-block;"></span>
+            Buka Sekarang
+          </div>
+
+          <!-- tagline -->
+          <h3 class="font-display font-bold text-foam" style="font-size:22px;line-height:1.3;margin-bottom:10px;position:relative;z-index:2;">
+            Kopi terbaik,<br><span style="color:#C99A5A;">untuk momen terbaikmu.</span>
+          </h3>
+          <p style="font-size:13px;color:rgba(212,184,150,0.65);line-height:1.7;position:relative;z-index:2;margin-bottom:22px;">
+            Dari espresso klasik hingga kreasi signature kami — setiap tegukan dirancang untuk jadi pengalaman yang tak terlupakan.
+          </p>
+
+          <!-- info grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;position:relative;z-index:2;">
+            <!-- jam buka -->
+            <div style="background:#2C1503;border-radius:18px;padding:14px;">
+              <p style="font-size:9px;font-weight:600;color:rgba(201,154,90,0.6);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Jam Buka</p>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:11px;color:rgba(212,184,150,0.55);">Sen–Jum</span>
+                <span style="font-size:11px;font-weight:600;color:#FBF5EC;">08–22</span>
               </div>
-              <p class="text-latte/72 text-sm leading-relaxed mb-5">Alegre Coffee hadir dengan semangat menyajikan cita rasa kopi terbaik dalam suasana yang hangat dan nyaman. Dari espresso klasik hingga kreasi signature kami, setiap tegukan adalah sebuah pengalaman.</p>
-              <div class="flex gap-2 flex-wrap">
-                <a href="https://wa.me/6285726685074" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold active:scale-95" style="background:rgba(37,211,102,.13);color:#25D366;border:1px solid rgba(37,211,102,.22);">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  WhatsApp
-                </a>
-                <a href="https://instagram.com/alegrecoffee" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style="background:rgba(201,154,90,.1);color:#C99A5A;border:1px solid rgba(201,154,90,.18);">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                  Instagram
-                </a>
+              <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 0;"></div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="font-size:11px;color:rgba(212,184,150,0.55);">Sab–Min</span>
+                <span style="font-size:11px;font-weight:600;color:#FBF5EC;">09–23</span>
               </div>
             </div>
-            <div class="mt-5 lg:mt-0 lg:w-52 flex-shrink-0">
-              <div class="bg-white/6 rounded-2xl p-4 border border-white/9">
-                <p class="text-honey text-[10px] font-bold tracking-widest uppercase mb-3">Jam Operasional</p>
-                <div class="space-y-2">
-                  <div class="flex justify-between text-sm"><span class="text-latte/60">Senin – Jumat</span><span class="text-foam font-semibold">08:00–22:00</span></div>
-                  <div class="flex justify-between text-sm"><span class="text-latte/60">Sabtu – Minggu</span><span class="text-foam font-semibold">09:00–23:00</span></div>
-                </div>
+            <!-- stats -->
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:12px 14px;">
+                <p style="font-size:9px;font-weight:600;color:rgba(201,154,90,0.6);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Menu</p>
+                <p class="font-display font-bold" style="font-size:24px;color:#FBF5EC;line-height:1;">70+</p>
+                <p style="font-size:10px;color:rgba(212,184,150,0.45);">Minuman & makanan</p>
+              </div>
+              <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:12px 14px;">
+                <p style="font-size:9px;font-weight:600;color:rgba(201,154,90,0.6);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Lokasi</p>
+                <p style="font-size:12px;font-weight:600;color:#FBF5EC;line-height:1.3;">Sidoarjo,<br>Jawa Timur</p>
               </div>
             </div>
+          </div>
+
+          <!-- action buttons -->
+          <div style="display:flex;gap:10px;position:relative;z-index:2;">
+            <a href="https://wa.me/6285726685074" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.2);border-radius:16px;padding:13px;font-size:13px;font-weight:600;color:#25D366;text-decoration:none;">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a href="https://instagram.com/alegrecoffee" target="_blank" style="width:50px;height:50px;background:rgba(201,154,90,0.1);border:1px solid rgba(201,154,90,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;">
+              <svg width="18" height="18" fill="none" stroke="#C99A5A" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
           </div>
         </div>
       </section>
